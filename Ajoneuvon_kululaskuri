@@ -1,0 +1,88 @@
+# Loin HUS verkkotentin lyhyen python ohjelman, jonka avulla esimerkiksi automyyjä voi luoda ajoneuvon tietokantaan ja lisätä mm. kuluja autolle
+# Ohjelma laskee myös auton arvon vanhan auton arvon autokaupan yhteydessä
+# Ohjelma on alustava pohja, jota voi tarvittaessa lähteä kehittämään
+
+
+class Auto:
+    autot = [] # Tyhjä lista
+
+    # Konstruktori
+    def __init__(self, automerkki: str, ostovuosi: int, osto_hinta: int):
+        self.autot = []
+        self.automerkki = automerkki
+        self.ostovuosi = ostovuosi
+        self.osto_hinta = osto_hinta
+        self.ajettu_matka = 0
+        self.auton_kulut = 0
+        self.auton_arvo = osto_hinta
+        self.vuosi_nyt = ostovuosi
+        Auto.autot.append(self) # Lisätään autot listaan
+
+        for auto in Auto.autot: # Päivittää vuodet
+            auto.vuosi_nyt = self.vuosi_nyt
+
+    # Metodi uudelle vuodelle
+    def aseta_vuosi(self, uusi_vuosi):
+        if uusi_vuosi > self.ostovuosi:
+            self.vuosi_nyt = uusi_vuosi
+    
+    # Metodi ajon kustannuksille
+    def aja(self, ajettu_matka: int, hinta_per_kilometri: float):
+        self.auton_kulut += (ajettu_matka * hinta_per_kilometri)
+        self.ajettu_matka += ajettu_matka
+
+    # Lisätään yksittäinen kulu
+    def lisaa_kulu(self, kulu: int):
+        self.auton_kulut += kulu
+    
+    # Näyttää ajetut kilometrit
+    def autolla_ajettu(self):
+        return self.ajettu_matka
+    
+    # Metodi joka palauttaa nykyisen arvon
+    def arvo_nyt(self):
+        auton_ika = self.vuosi_nyt - self.ostovuosi
+        arvo = self.osto_hinta
+        for kohta in range(auton_ika):
+            arvo *= 0.85
+        return round(arvo)
+    
+    # Palauttaa kustannukset per kilometri
+    def kustannus_per_kilometri(self):
+        kulut = self.osto_hinta - self.arvo_nyt() + self.auton_kulut
+        return kulut / self.ajettu_matka
+
+    # Tulostus
+    def __str__(self):
+        return f"{self.automerkki}: ostovuosi {self.ostovuosi}, arvo {self.arvo_nyt()}"
+
+        
+
+# Suoritetaan ohjelmaa
+toyota = Auto("Toyota", 2020, 10000)
+print(toyota)
+
+toyota.aja(100, 0.10)
+print(f"Toyotalla ajetut kilometrit: {toyota.autolla_ajettu()}")
+
+toyota.aseta_vuosi(2021)
+print(f"Toyotan arvo vuonna {toyota.vuosi_nyt}: {toyota.arvo_nyt()}")
+print(toyota)
+
+print(f"Toyotan kustannus per kilometri vuonna {toyota.vuosi_nyt}: {toyota.kustannus_per_kilometri()}")
+
+toyota.aseta_vuosi(2022)
+print(f"Toyotan arvo vuonna {toyota.vuosi_nyt}: {toyota.arvo_nyt()}")
+
+bmw = Auto("BMW", 2023, 20000)
+print(f"Toyotan arvo bmw:n oston jälkeen: {toyota.arvo_nyt()}")
+
+bmw.aja(200, 0.12)
+bmw.aja(300, 0.13)
+
+print(f"Ajettu kilometrit (BMW): {bmw.autolla_ajettu()}")
+print(f"Kustannus per kilometri BMW:lle vuonna 2023: {bmw.kustannus_per_kilometri()}")
+
+bmw.lisaa_kulu(1000)
+
+print(f"Kustannus per kilometri BMW:lle 1000 euron huollon jälkeen: {bmw.kustannus_per_kilometri()}")
